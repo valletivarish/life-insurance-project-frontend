@@ -2,24 +2,26 @@ import React from "react";
 import "./Table.css";
 import Pagination from "../Pagination/Pagination";
 import Dropdown from "../Dropdown/Dropdown";
-const Table = (props) => {
-  const { data, setSearchParams, searchParams } =
-    props;
-  const content = data.content;
 
-  if (content && content.length > 0) {
+const Table = (props) => {
+  const { data, setSearchParams, searchParams } = props;
+
+  if (data && data.content && data.content.length > 0) {
+    const content = data.content;
+
+
     const tableHeaders = (
       <tr>
         {Object.keys(content[0]).map((key) => (
-          <th>{key}</th>
+          <th key={key}>{key}</th> 
         ))}
       </tr>
     );
 
-    const tableData = content.map((d) => (
-      <tr>
+    const tableData = content.map((d, index) => (
+      <tr key={index}>
         {Object.keys(d).map((k) => (
-          <td>{d[k]}</td>
+          <td key={k}>{d[k]}</td>
         ))}
       </tr>
     ));
@@ -27,11 +29,15 @@ const Table = (props) => {
     return (
       <div className="table-container">
         <table className="table">
-          <thead className="thead">{tableHeaders}</thead>
-          <tbody>{tableData}</tbody>
+          <thead className="thead">
+            {tableHeaders}
+          </thead>
+          <tbody>
+            {tableData}
+          </tbody>
         </table>
         <div className="pagination-section">
-          <Dropodown
+          <Dropdown
             searchParams={searchParams}
             setSearchParams={setSearchParams}
             data={data}
@@ -45,6 +51,8 @@ const Table = (props) => {
         </div>
       </div>
     );
+  } else {
+    return <div>No data available</div>;
   }
 };
 

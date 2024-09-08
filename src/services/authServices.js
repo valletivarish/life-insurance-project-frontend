@@ -37,3 +37,4 @@ export const register = async (payload) => {
       throw new Error('Something went wrong. Please try again later.');
     }
   };
+

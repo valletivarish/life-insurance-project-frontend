@@ -1,0 +1,138 @@
+.states-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center; 
+    min-height: 100vh;
+    background: linear-gradient(135deg, #f0f2f5, #dce1e6);
+    padding: 20px;
+}
+
+.states-header {
+    text-align: center;
+    font-size: 34px;
+    font-weight: bold;
+    color: #2c3e50;
+    text-transform: uppercase;
+    letter-spacing: 1.8px;
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.states-header::after {
+    content: '';
+    width: 70px;
+    height: 5px;
+    background-color: #ff9800;
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.states-card {
+    border-radius: 15px;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+    padding: 50px 40px;
+    background-color: #fff;
+    max-width: 800px;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px; /* Space between heading and table */
+}
+
+.table th, .table td {
+    padding: 15px;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+    font-size: 16px;
+}
+
+.table th {
+    background-color: #333;
+    color: #ff9800;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.table td {
+    color: #333;
+}
+
+.table-buttons {
+    display: flex;
+    justify-content: center;
+}
+
+.activate-state-button,
+.deactivate-state-button {
+    background-color: #ff9800;
+    border: none;
+    color: #fff;
+    font-size: 14px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+}
+
+.activate-state-button:hover,
+.deactivate-state-button:hover {
+    background-color: #fd9f10;
+    box-shadow: 0 6px 20px rgba(255, 107, 74, 0.4);
+}
+
+.add-state-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.add-state-input {
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    margin-right: 10px;
+    width: 300px;
+}
+
+.add-state-button {
+    background-color: #28a745;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.add-state-button:hover {
+    background-color: #218838;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .states-card {
+        padding: 30px 20px;
+    }
+
+    .table th, .table td {
+        padding: 10px;
+    }
+
+    .table-buttons button {
+        font-size: 12px;
+        padding: 6px 12px;
+    }
+
+    .add-state-input {
+        width: 100%;
+    }
+}

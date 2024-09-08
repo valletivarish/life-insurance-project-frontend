@@ -5,7 +5,8 @@ import './CustomerRegistration.css';
 import { register } from '../../services/authServices';
 import { useNavigate } from 'react-router-dom';
 import { showToastError, showToastSuccess } from '../../utils/toast/Toast';
-import { required, email, alphanumeric, alphabetsOnly, positiveNumeric, isStrongPassword, minLength } from '../../utils/validators/Validators'; // Validators
+import { required, email as isEmail, alphanumeric, alphabetsOnly, positiveNumeric, isStrongPassword, minLength } from '../../utils/validators/Validators'; 
+import BackButton from '../../sharedComponents/Button/BackButton';
 
 const CustomerRegistration = () => {
     const navigate = useNavigate();
@@ -20,10 +21,10 @@ const CustomerRegistration = () => {
     const [apartment, setApartment] = useState('');
     const [pincode, setPincode] = useState('');
     const [states, setStates] = useState([]);
-    const [selectedState, setSelectedState] = useState();
+    const [selectedState, setSelectedState] = useState('');
     const [cities, setCities] = useState([]);
-    const [selectedCity, setSelectedCity] = useState();
-    const [errors, setErrors] = useState({}); // New state for tracking field-specific errors
+    const [selectedCity, setSelectedCity] = useState('');
+    const [errors, setErrors] = useState({});
 
     useEffect(() => {
         const getAllStatesData = async () => {
@@ -42,33 +43,111 @@ const CustomerRegistration = () => {
         } else {
             setCities([]);
         }
+        setSelectedCity('');
     };
 
-    const renderStates = () => {
-        return states.map((state, index) => (
-            <option key={index} value={state.id}>{state.name}</option>
-        ));
+    const validateField = (field, value) => {
+        let error = '';
+        switch (field) {
+            case 'firstName':
+                error = alphabetsOnly(value) || required(value) ? 'First Name is invalid.' : '';
+                break;
+            case 'lastName':
+                error = alphabetsOnly(value) || required(value) ? 'Last Name is invalid.' : '';
+                break;
+            case 'dateOfBirth':
+                error = required(value) ? 'Date of Birth is required.' : '';
+                break;
+            case 'phoneNumber':
+                error = positiveNumeric(value) || minLength(value, 10) || required(value) ? 'Phone Number is invalid.' : '';
+                break;
+            case 'username':
+                error = alphanumeric(value) || required(value) ? 'Username is invalid.' : '';
+                break;
+            case 'emailAddress':
+                error = isEmail(value) || required(value) ? 'Email is invalid.' : '';
+                break;
+            case 'password':
+                error = isStrongPassword(value) || required(value) ? 'Password is invalid.' : '';
+                break;
+            case 'houseNo':
+                error = required(value) ? 'House Number is required.' : '';
+                break;
+            case 'pincode':
+                error = positiveNumeric(value) || minLength(value, 6) || required(value) ? 'Pincode is invalid.' : '';
+                break;
+            case 'selectedState':
+                error = required(value) ? 'State is required.' : '';
+                break;
+            case 'selectedCity':
+                error = required(value) ? 'City is required.' : '';
+                break;
+            default:
+                break;
+        }
+        return error;
     };
 
-    const renderCities = () => {
-        return cities.map((city, index) => (
-            <option key={index} value={city.id}>{city.city}</option>
-        ));
+    const handleFieldChange = (field, value) => {
+        switch (field) {
+            case 'firstName':
+                setFirstName(value);
+                break;
+            case 'lastName':
+                setLastName(value);
+                break;
+            case 'dateOfBirth':
+                setDob(value);
+                break;
+            case 'phoneNumber':
+                setPhoneNumber(value);
+                break;
+            case 'username':
+                setUsername(value);
+                break;
+            case 'emailAddress':
+                setEmail(value);
+                break;
+            case 'password':
+                setPassword(value);
+                break;
+            case 'houseNo':
+                setHouseNo(value);
+                break;
+            case 'apartment':
+                setApartment(value);
+                break;
+            case 'pincode':
+                setPincode(value);
+                break;
+            case 'selectedState':
+                setSelectedState(value);
+                break;
+            case 'selectedCity':
+                setSelectedCity(value);
+                break;
+            default:
+                break;
+        }
+
+        const newErrors = { ...errors };
+        newErrors[field] = validateField(field, value);
+        setErrors(newErrors);
     };
 
     const validateFields = () => {
         const newErrors = {};
-
-        newErrors.firstName = alphabetsOnly(firstName) || required(firstName) ? 'First Name is invalid.' : '';
-        newErrors.lastName = alphabetsOnly(lastName) || required(lastName) ? 'Last Name is invalid.' : '';
-        newErrors.dateOfBirth = required(dateOfBirth) ? 'Date of Birth is required.' : '';
-        newErrors.phoneNumber = positiveNumeric(phoneNumber) || minLength(phoneNumber, 10) || required(phoneNumber) ? 'Phone Number is invalid.' : '';
-        newErrors.username = alphanumeric(username) || required(username) ? 'Username is invalid.' : '';
-        newErrors.emailAddress = email(emailAddress) || required(emailAddress) ? 'Email is invalid.' : '';
-        newErrors.password = isStrongPassword(password) || required(password) ? 'Password is invalid.' : '';
-        newErrors.houseNo = required(houseNo) ? 'House Number is required.' : '';
-        
-        newErrors.pincode = positiveNumeric(pincode) || minLength(pincode, 6) || required(pincode) ? 'Pincode is invalid.' : '';
+        newErrors.firstName = validateField('firstName', firstName);
+        newErrors.lastName = validateField('lastName', lastName);
+        newErrors.dateOfBirth = validateField('dateOfBirth', dateOfBirth);
+        newErrors.phoneNumber = validateField('phoneNumber', phoneNumber);
+        newErrors.username = validateField('username', username);
+        newErrors.emailAddress = validateField('emailAddress', emailAddress);
+        newErrors.password = validateField('password', password);
+        newErrors.houseNo = validateField('houseNo', houseNo);
+        newErrors.pincode = validateField('pincode', pincode);
+        newErrors.selectedState = validateField('selectedState', selectedState);
+        newErrors.selectedCity = validateField('selectedCity', selectedCity);
 
         setErrors(newErrors);
         return Object.values(newErrors).every((error) => error === '');
@@ -108,9 +187,23 @@ const CustomerRegistration = () => {
         }
     };
 
+    const renderStates = () => {
+        return states.map((state, index) => (
+            <option key={index} value={state.id}>{state.name}</option>
+        ));
+    };
+
+    const renderCities = () => {
+        return cities.map((city, index) => (
+            <option key={index} value={city.id}>{city.city}</option>
+        ));
+    };
+
     return (
         <Container className="registration-container">
+            
             <div className="registration-card">
+            <BackButton/>
                 <h2 className="text-center registration-header">Customer Registration</h2>
                 <Form className="registration-form" onSubmit={handleRegister}>
                     <Row>
@@ -121,8 +214,8 @@ const CustomerRegistration = () => {
                                     className="registration-input"
                                     placeholder="Enter First Name"
                                     value={firstName}
-                                    onChange={(e) => setFirstName(e.target.value)}
-                                    isInvalid={!!errors.firstName}
+                                    onChange={(e) => handleFieldChange('firstName', e.target.value)}
+                                    isInvalid={errors.firstName ? true : false}
                                 />
                                 <Form.Control.Feedback type="invalid">
                                     {errors.firstName}
@@ -136,8 +229,8 @@ const CustomerRegistration = () => {
                                     className="registration-input"
                                     placeholder="Enter Last Name"
                                     value={lastName}
-                                    onChange={(e) => setLastName(e.target.value)}
-                                    isInvalid={!!errors.lastName}
+                                    onChange={(e) => handleFieldChange('lastName', e.target.value)}
+                                    isInvalid={errors.lastName ? true : false}
                                 />
                                 <Form.Control.Feedback type="invalid">
                                     {errors.lastName}
@@ -153,8 +246,8 @@ const CustomerRegistration = () => {
                                     type="date"
                                     className="registration-input"
                                     value={dateOfBirth}
-                                    onChange={(e) => setDob(e.target.value)}
-                                    isInvalid={!!errors.dateOfBirth}
+                                    onChange={(e) => handleFieldChange('dateOfBirth', e.target.value)}
+                                    isInvalid={errors.dateOfBirth ? true : false}
                                 />
                                 <Form.Control.Feedback type="invalid">
                                     {errors.dateOfBirth}
@@ -168,8 +261,8 @@ const CustomerRegistration = () => {
                                     className="registration-input"
                                     placeholder="Enter Phone Number"
                                     value={phoneNumber}
-                                    onChange={(e) => setPhoneNumber(e.target.value)}
-                                    isInvalid={!!errors.phoneNumber}
+                                    onChange={(e) => handleFieldChange('phoneNumber', e.target.value)}
+                                    isInvalid={errors.phoneNumber ? true : false}
                                 />
                                 <Form.Control.Feedback type="invalid">
                                     {errors.phoneNumber}
@@ -186,8 +279,8 @@ const CustomerRegistration = () => {
                                     className="registration-input"
                                     placeholder="Enter Username"
                                     value={username}
-                                    onChange={(e) => setUsername(e.target.value)}
-                                    isInvalid={!!errors.username}
+                                    onChange={(e) => handleFieldChange('username', e.target.value)}
+                                    isInvalid={errors.username ? true : false}
                                 />
                                 <Form.Control.Feedback type="invalid">
                                     {errors.username}
@@ -201,8 +294,8 @@ const CustomerRegistration = () => {
                                     className="registration-input"
                                     placeholder="Enter Email"
                                     value={emailAddress}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    isInvalid={!!errors.emailAddress}
+                                    onChange={(e) => handleFieldChange('emailAddress', e.target.value)}
+                                    isInvalid={errors.emailAddress ? true : false}
                                 />
                                 <Form.Control.Feedback type="invalid">
                                     {errors.emailAddress}
@@ -219,8 +312,8 @@ const CustomerRegistration = () => {
                                     className="registration-input"
                                     placeholder="Enter Password"
                                     value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    isInvalid={!!errors.password}
+                                    onChange={(e) => handleFieldChange('password', e.target.value)}
+                                    isInvalid={errors.password ? true : false}
                                 />
                                 <Form.Control.Feedback type="invalid">
                                     {errors.password}
@@ -237,8 +330,8 @@ const CustomerRegistration = () => {
                                     className="registration-input"
                                     placeholder="Enter House No"
                                     value={houseNo}
-                                    onChange={(e) => setHouseNo(e.target.value)}
-                                    isInvalid={!!errors.houseNo}
+                                    onChange={(e) => handleFieldChange('houseNo', e.target.value)}
+                                    isInvalid={errors.houseNo ? true : false}
                                 />
                                 <Form.Control.Feedback type="invalid">
                                     {errors.houseNo}
@@ -252,7 +345,7 @@ const CustomerRegistration = () => {
                                     className="registration-input"
                                     placeholder="Enter Apartment"
                                     value={apartment}
-                                    onChange={(e) => setApartment(e.target.value)}
+                                    onChange={(e) => handleFieldChange('apartment', e.target.value)}
                                 />
                             </Form.Group>
                         </Col>
@@ -263,8 +356,8 @@ const CustomerRegistration = () => {
                                     className="registration-input"
                                     placeholder="Enter Pincode"
                                     value={pincode}
-                                    onChange={(e) => setPincode(e.target.value)}
-                                    isInvalid={!!errors.pincode}
+                                    onChange={(e) => handleFieldChange('pincode', e.target.value)}
+                                    isInvalid={errors.pincode ? true : false}
                                 />
                                 <Form.Control.Feedback type="invalid">
                                     {errors.pincode}
@@ -280,11 +373,15 @@ const CustomerRegistration = () => {
                                     as="select"
                                     className="registration-input"
                                     value={selectedState}
-                                    onChange={handleStateChange}
+                                    onChange={(e) => handleFieldChange('selectedState', e.target.value)}
+                                    isInvalid={errors.selectedState ? true : false}
                                 >
                                     <option value="">Select State</option>
                                     {renderStates()}
                                 </Form.Control>
+                                <Form.Control.Feedback type="invalid">
+                                    {errors.selectedState}
+                                </Form.Control.Feedback>
                             </Form.Group>
                         </Col>
                         <Col md={6}>
@@ -293,12 +390,16 @@ const CustomerRegistration = () => {
                                     as="select"
                                     className="registration-input"
                                     value={selectedCity}
-                                    onChange={(e) => setSelectedCity(parseInt(e.target.value))}
+                                    onChange={(e) => handleFieldChange('selectedCity', e.target.value)}
                                     disabled={!selectedState}
+                                    isInvalid={errors.selectedCity ? true : false}
                                 >
                                     <option value="">Select City</option>
                                     {renderCities()}
                                 </Form.Control>
+                                <Form.Control.Feedback type="invalid">
+                                    {errors.selectedCity}
+                                </Form.Control.Feedback>
                             </Form.Group>
                         </Col>
                     </Row>

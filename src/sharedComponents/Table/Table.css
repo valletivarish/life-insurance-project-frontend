@@ -1,0 +1,84 @@
+.table-container {
+    width: 100%;
+    margin: 20px 0;
+    overflow-x: auto;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px solid #333;
+}
+
+.thead {
+    background-color: #333;
+    color: white;
+}
+
+th, td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #555;
+}
+
+th {
+    background-color: #333;
+    color: #ff9800;
+    font-weight: bold;
+}
+
+td {
+    color: #000;
+    font-size: 14px;
+}
+
+tr:hover>td {
+    cursor: pointer;
+    background-color: #686868;
+    color: white;
+}
+
+.pagination-section {
+    display: flex;
+    justify-content: space-between;
+    margin: 20px 0;
+}
+
+.custom-dropdown select {
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #555;
+    background-color: #222;
+    color: white;
+    font-size: 14px;
+}
+
+.custom-dropdown select:focus {
+    border-color: #ff4b5c;
+}
+
+.pagination-section button {
+    padding: 10px 15px;
+    border-radius: 5px;
+    border: none;
+    background-color: #ff4b5c;
+    color: white;
+    cursor: pointer;
+}
+
+.pagination-section button:hover {
+    background-color: #ff2a3b;
+}
+
+.pagination-section button:disabled {
+    background-color: #444;
+    cursor: not-allowed;
+    color: #888;
+}
+
+.no-data {
+    color: #888;
+    font-size: 16px;
+    text-align: center;
+    margin-top: 20px;
+}
