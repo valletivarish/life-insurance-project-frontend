@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { getAllStates, deactivateState } from '../../../../../services/gaurdianLifeAssuranceServices'; // Deactivate state request here
+import { getAllStates, deactivateState, activateState } from '../../../../../services/gaurdianLifeAssuranceServices';
 import { addState } from '../../../../../services/adminServices';
-import { editState } from '../../../../../services/gaurdianLifeAssuranceServices';
 import Table from '../../../../../sharedComponents/Table/Table'; 
-import { useSearchParams } from 'react-router-dom'; 
+import { useSearchParams, useNavigate } from 'react-router-dom'; 
 import { sanitizeStateData } from '../../../../../utils/helpers/SanitizeData'; 
 import { required } from '../../../../../utils/validators/Validators';
 import './ViewStates.css'; 
 import { capitalizeWords } from '../../../../../utils/helpers/CapitilizeData';
-import EditStateModal from './EditStateModal';
+import { showToastSuccess, showToastError } from '../../../../../utils/toast/Toast';
 
 const ViewStates = () => {
   const [states, setStates] = useState([]);
@@ -17,18 +16,18 @@ const ViewStates = () => {
   const [error, setError] = useState(null);
   const [inputError, setInputError] = useState(null);
   const [searchParams, setSearchParams] = useSearchParams();
-  const [isModalOpen, setModalOpen] = useState(false);
-  const [currentEditState, setCurrentEditState] = useState(null);
+  const navigate = useNavigate(); 
 
   useEffect(() => {
     const fetchStates = async () => {
       try {
-        const response = await getAllStates();
+        
+        const response = await getAllStates(searchParams);
         if (response && response.content) {
           const sanitized = sanitizeStateData(
             response, 
             ['id', 'name', 'active'],
-            handleActivateDeactivate, // Deactivate function passed
+            handleActivateDeactivate, 
             handleEdit
           );
           setSanitizedStates(sanitized);
@@ -36,16 +35,22 @@ const ViewStates = () => {
         }
       } catch (error) {
         setError('Failed to fetch states');
+        showToastError('Failed to fetch states');
       }
     };
     fetchStates();
-  }, []);
+  }, [searchParams]);
 
-  // Deactivate or Activate state
   const handleActivateDeactivate = async (stateId, isActive) => {
     try {
-      await deactivateState(stateId); // Send deactivate request
-      const response = await getAllStates(); // Re-fetch updated data
+      if (isActive) {
+        await deactivateState(stateId);
+        showToastSuccess('State deactivated successfully');
+      } else {
+        await activateState(stateId);
+        showToastSuccess('State activated successfully');
+      }
+      const response = await getAllStates();
       if (response && response.content) {
         const sanitized = sanitizeStateData(
           response, 
@@ -58,6 +63,7 @@ const ViewStates = () => {
       }
     } catch (error) {
       setError('Failed to deactivate/activate state');
+      showToastError('Failed to deactivate/activate state');
     }
   };
 
@@ -70,6 +76,7 @@ const ViewStates = () => {
 
     try {
       await addState({ name: capitalizeWords(newState) });
+      showToastSuccess('State added successfully');
       const response = await getAllStates();
       if (response && response.content) {
         const sanitized = sanitizeStateData(
@@ -85,35 +92,12 @@ const ViewStates = () => {
       }
     } catch (error) {
       setError('Failed to add new state');
+      showToastError('Failed to add new state');
     }
   };
 
   const handleEdit = (stateId) => {
-    const stateToEdit = states.find(state => state.id === stateId);
-    if (stateToEdit) {
-      setCurrentEditState(stateToEdit); 
-      setTimeout(() => setModalOpen(true), 0); // Delay modal open slightly to ensure state is set
-    }
-  };
-
-  const handleSaveEdit = async (updatedState) => {
-    try {
-      await editState(updatedState); 
-      const response = await getAllStates(); 
-      if (response && response.content) {
-        const sanitized = sanitizeStateData(
-          response, 
-          ['id', 'name', 'active'],
-          handleActivateDeactivate,
-          handleEdit
-        );
-        setSanitizedStates(sanitized);
-        setStates(response.content); 
-      }
-      setModalOpen(false); 
-    } catch (error) {
-      setError('Failed to edit state');
-    }
+    navigate(`/settings/states/edit-state/${stateId}`); 
   };
 
   if (error) {
@@ -141,15 +125,6 @@ const ViewStates = () => {
         searchParams={searchParams}
         setSearchParams={setSearchParams}
       />
-
-      {isModalOpen && (
-        <EditStateModal
-          show={isModalOpen}
-          currentState={currentEditState} 
-          onClose={() => setModalOpen(false)}
-          onSave={handleSaveEdit}
-        />
-      )}
     </div>
   );
 };

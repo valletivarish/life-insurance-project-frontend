@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { showToastError, showToastSuccess } from '../../utils/toast/Toast';
 import { required, email as isEmail, alphanumeric, alphabetsOnly, positiveNumeric, isStrongPassword, minLength } from '../../utils/validators/Validators'; 
 import BackButton from '../../sharedComponents/Button/BackButton';
+import { getStateCount } from '../../services/stateAndCityManagementService';
 
 const CustomerRegistration = () => {
     const navigate = useNavigate();
@@ -28,7 +29,8 @@ const CustomerRegistration = () => {
 
     useEffect(() => {
         const getAllStatesData = async () => {
-            const statesData = await getAllStates();
+            const count=await getStateCount();
+            const statesData = await getAllStates({size:count});
             setStates(statesData.content);
         };
         getAllStatesData();
@@ -373,7 +375,10 @@ const CustomerRegistration = () => {
                                     as="select"
                                     className="registration-input"
                                     value={selectedState}
-                                    onChange={(e) => handleFieldChange('selectedState', e.target.value)}
+                                    onChange={(e) => {
+                                        handleFieldChange('selectedState', e.target.value)
+                                        handleStateChange(e)
+                                    }}
                                     isInvalid={errors.selectedState ? true : false}
                                 >
                                     <option value="">Select State</option>

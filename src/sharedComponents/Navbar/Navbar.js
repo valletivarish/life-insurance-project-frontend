@@ -1,32 +1,57 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { FaFacebook, FaTwitter, FaLinkedin } from "react-icons/fa";
+import { FaUser } from "react-icons/fa";
 import "./Navbar.css";
+import { useParams } from "react-router-dom";
+import { Helper } from "../../utils/helpers/Helper";
 import { getAllPlans } from "../../services/gaurdianLifeAssuranceServices";
+import { getPlanCount } from "../../services/insuranceManagementServices";
 
-const Navbar = ({ role, setRole }) => {
+const Navbar = ({ role, setRole,refreshNavbar }) => {
   const [plans, setPlans] = useState([]);
   const navigate = useNavigate();
+  const { customerId } = useParams();
 
   useEffect(() => {
     const fetchPlans = async () => {
       try {
-        const response = await getAllPlans();
-        setPlans(response);
-        console.log(plans);
+        const count=await getPlanCount();
+        const response = await getAllPlans({size:count});
+        setPlans(response.content);
       } catch (error) {
         console.error("Error fetching plans:", error);
       }
     };
     fetchPlans();
-  }, []);
+  }, [refreshNavbar]);
 
   const insurancePlans = () => {
-    return plans.map((plan) => (
-      <Link to={`/plans/${plan.planId}`} key={plan.id}>
-        {plan.planName}
-      </Link>
-    ));
+    return plans
+      .filter((plan) => plan.active)
+      .map((plan) => (
+        <Link to={`admin-dashboard/schemes/add/${plan.planId}`} key={plan.planId}>
+          {plan.planName}
+        </Link>
+      ));
+  };
+  const customerPlans = () => {
+    return plans
+      .filter((plan) => plan.active)
+      .map((plan) => (
+        <Link to={getRoleLink(`/plans/view/${plan.planId}`)} key={plan.planId}>
+          {plan.planName}
+        </Link>
+      ));
+  };
+
+
+  const getRoleLink = (link = "") => {
+    return Helper.getRoleLink(role,customerId, link);
+  };
+
+
+  const getProfileLink = () => {
+    return getRoleLink("/account");
   };
 
   const handleLogout = () => {
@@ -65,38 +90,57 @@ const Navbar = ({ role, setRole }) => {
         return (
           <>
             <li>
-              <Link to="/dashboard">Dashboard</Link>
+              <Link to={getRoleLink()}>Dashboard</Link>
+            </li>
+            <li className="dropdown">
+              <span>Insurance</span>
+              <div className="dropdown-content">
+                <Link to={getRoleLink("/customers/view")}>View Customers</Link>
+                <Link to={getRoleLink("/policies/view")}>Insurance Account</Link>
+                <Link to={getRoleLink("/policies/payments/view")}>View Policy Payment</Link>
+                <Link to={getRoleLink("/policies/claims/view")}>View Policy Claim</Link>
+              </div>
             </li>
             <li className="dropdown">
               <span>Agents</span>
               <div className="dropdown-content">
-                <Link to="/agents/add">Add Agent</Link>
-                <Link to="/agents/view">view Agents</Link>
-                <Link to="/commissions">View Commissions</Link>
-                <Link to="/commissions-withdrawals">
-                  View Commissions Withdrawal
-                </Link>
+                <Link to={getRoleLink("/agents/add")}>Add Agent</Link>
+                <Link to={getRoleLink("/agents/view")}>View Agents</Link>
+                <Link to={getRoleLink("/commissions/view")}>View Commissions</Link>
+                <Link to={getRoleLink("/commissions-withdrawals/view")}>View Commissions Withdrawals</Link>
               </div>
             </li>
             <li className="dropdown">
               <span>Insurance Plans</span>
               <div className="dropdown-content">
-                <Link to="/plans/manage">Manage Plans</Link>
-                <Link to="/plans/approve">Approve Plans</Link>
+                <Link to={getRoleLink("/plans/add")}>Add Plan</Link>
+                <Link to={getRoleLink("/plans/view")}>View Plans</Link>
+                <div className="dropdown-right">
+                  <Link to="#" className="dropdown-link">Add Scheme {">"}</Link>
+                  <div className="dropdown-content-right">
+                    {insurancePlans()}
+                  </div>
+                </div>
+                <Link to={getRoleLink("/schemes/view")}>View Schemes</Link>
               </div>
             </li>
             <li className="dropdown">
-              <Link to="/settings">Settings</Link>
+              <Link to={getRoleLink("/settings")}>Settings</Link>
               <div className="dropdown-content">
-                <Link to="/settings/tax">Tax Settings</Link>
-                <Link to="/settings/insurance">Insurance Settings</Link>
-                <Link to="/settings/states/view">View States</Link>
-                <Link to="/settings/cities/add">Add City</Link>
-                <Link to="/settings/cities/view">View Cities</Link>
+                <Link to={getRoleLink("/settings/tax")}>Tax Settings</Link>
+                <Link to={getRoleLink("/settings/insurance")}>Insurance Settings</Link>
+                <Link to={getRoleLink("/settings/states/view")}>View States</Link>
+                <Link to={getRoleLink("/settings/cities/view")}>View Cities</Link>
               </div>
             </li>
             <li>
-              <Link to="/account">Account</Link>
+              <Link to={getProfileLink()}>Account</Link>
+              <div className="dropdown-content">
+                <Link to={getRoleLink("/employees/add")}>Add Employee</Link>
+                <Link to={getRoleLink("/employees/view")}>View Employees</Link>
+                <Link to={getRoleLink("/profile")}>Profile</Link>
+                <Link to={getRoleLink("/profile/change-password")}>Change Password</Link>
+              </div>
             </li>
             <li>
               <span onClick={handleLogout} style={{ cursor: "pointer" }}>
@@ -109,26 +153,33 @@ const Navbar = ({ role, setRole }) => {
         return (
           <>
             <li>
-              <Link to="/dashboard">Dashboard</Link>
+              <Link to={getRoleLink()}>Dashboard</Link>
             </li>
             <li className="dropdown">
-              <Link to="/agents">Agents</Link>
+              <span>Agents</span>
               <div className="dropdown-content">
-                <Link to="/agents/view">View Agents</Link>
-                <Link to="/agents/approve">Approve Agents</Link>
+                <Link to={getRoleLink("/agents/add")}>Add Agent</Link>
+                <Link to={getRoleLink("/agents/view")}>View Agents</Link>
+                <Link to={getRoleLink("/commissions/view")}>View Commissions</Link>
+                <Link to={getRoleLink("/commissions-withdrawals/view")}>View Commissions Withdrawals</Link>
               </div>
             </li>
             <li className="dropdown">
-              <span>Insurance Plans</span>
+              <span>Insurance</span>
               <div className="dropdown-content">
-                <Link to="/insurance/policies">Policies</Link>
-                <Link to="/insurance/claims">Claims</Link>
+                <Link to={getRoleLink("/customers/view")}>View Customers</Link>
+                <Link to={getRoleLink("/policies/view")}>Insurance Account</Link>
+                <Link to={getRoleLink("/policies/payments/view")}>View Policy Payment</Link>
+                <Link to={getRoleLink("/policies/claims/view")}>View Policy Claim</Link>
               </div>
             </li>
-            <li className="dropdown">
-              <Link to="/accounts">Accounts</Link>
+            <li>
+              <span onClick={handleLogout} style={{ cursor: "pointer" }}>
+                Account
+              </span>
               <div className="dropdown-content">
-                <Link to="/accounts/manage">Manage Accounts</Link>
+                <Link to={getRoleLink("/profile")}>Profile</Link>
+                <Link to={getRoleLink("/profile/change-password")}>Change Password</Link>
               </div>
             </li>
             <li>
@@ -142,25 +193,35 @@ const Navbar = ({ role, setRole }) => {
         return (
           <>
             <li>
-              <Link to="/account">Agent Account</Link>
+              <Link to={getRoleLink()}>Dashboard</Link>
             </li>
             <li className="dropdown">
-              <span>Insurance Plans</span>
+              <span>Commissions</span>
               <div className="dropdown-content">
-                <Link to="/accounts/manage">Manage Accounts</Link>
+                <Link to={getRoleLink("/commissions/view")}>View Commission</Link>
+                <Link to={getRoleLink("/commissions-withdrawals/view")}>View Commission Withdrawals</Link>
+                <Link to={getRoleLink()}>Withdrawal Amount</Link>
               </div>
             </li>
             <li className="dropdown">
-              <Link to="/marketing">Marketing Insurance</Link>
-              <div className="dropdown-content">
-                <Link to="/marketing/strategy">Strategy</Link>
-                <Link to="/marketing/campaigns">Campaigns</Link>
-              </div>
+              <Link to={getRoleLink("/marketing")}>Marketing</Link>
             </li>
             <li className="dropdown">
-              <Link to="/commissions">Commissions</Link>
+              <Link to={getRoleLink()}>Insurance</Link>
               <div className="dropdown-content">
-                <Link to="/commissions/view">View Commissions</Link>
+                <Link to={getRoleLink("/customers/view")}>View Customers</Link>
+                <Link to={getRoleLink("/policies/view")}>Insurance Account</Link>
+                <Link to={getRoleLink("/policies/payments/view")}>View Policy Payments</Link>
+                <Link to={getRoleLink("/policies/claims/view")}>View Policy Claims</Link>
+              </div>
+            </li>
+            <li>
+              <span onClick={handleLogout} style={{ cursor: "pointer" }}>
+                Account
+              </span>
+              <div className="dropdown-content">
+                <Link to={getRoleLink("/profile")}>Profile</Link>
+                <Link to={getRoleLink("/profile/change-password")}>Change Password</Link>
               </div>
             </li>
             <li>
@@ -173,29 +234,25 @@ const Navbar = ({ role, setRole }) => {
       case "customer":
         return (
           <>
-            <li className="dropdown">
-              <Link to="/account">Customer Profile</Link>
-              <div className="dropdown-content">
-                <Link to="/account/view">View Profile</Link>
-                <Link to="/account/edit">Edit Profile</Link>
-              </div>
+          <li>
+              <Link to={getRoleLink("")}>Dashboard</Link>
             </li>
             <li className="dropdown">
-              <span>Insurance Plans</span>
+              <span>Customer Profile</span>
               <div className="dropdown-content">
-                <Link to="/plans/view">View Plans</Link>
-                <Link to="/plans/apply">Apply for Plan</Link>
+                <Link to={getRoleLink("/profile")}>Profile</Link>
+                <Link to={getRoleLink("/documents/view")}>Documents</Link>
+                <Link to={getRoleLink("/profile/change-password")}>Change Password</Link>
               </div>
             </li>
             <li>
-              <Link to="/insurance-accounts">Insurance Accounts</Link>
-            </li>
-            <li className="dropdown">
-              <Link to="/queries">Queries</Link>
+              <Link to="#">Insurance Plans</Link>
               <div className="dropdown-content">
-                <Link to="/queries/view">View Queries</Link>
-                <Link to="/queries/submit">Submit Query</Link>
+                {customerPlans()}
               </div>
+            </li>
+            <li>
+              <Link to={getRoleLink(`/policies/view`)}>Insurance Account</Link>
             </li>
             <li>
               <span onClick={handleLogout} style={{ cursor: "pointer" }}>
@@ -209,32 +266,26 @@ const Navbar = ({ role, setRole }) => {
     }
   };
 
+
   return (
     <header className="navbar">
       <div className="navbar-top">
         <div className="navbar-logo">
           <h2>Guardian Life Assurance</h2>
         </div>
-        <ul className="navbar-social-icons">
-          <li>
-            <a href="#">
-              <FaFacebook />
-            </a>
-          </li>
-          <li>
-            <a href="#">
-              <FaTwitter />
-            </a>
-          </li>
-          <li>
-            <a href="#">
-              <FaLinkedin />
-            </a>
-          </li>
-        </ul>
+        {role && (
+          <ul className="navbar-profile">
+            <li>
+              <Link to={getProfileLink()}>
+                <FaUser />
+                <span>Profile</span>
+              </Link>
+            </li>
+          </ul>
+        )}
       </div>
 
-      <nav className="navbar-bottom ">
+      <nav className="navbar-bottom">
         <ul className="navbar-menu">{renderLinks()}</ul>
       </nav>
     </header>

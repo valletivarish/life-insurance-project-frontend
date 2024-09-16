@@ -48,3 +48,9 @@ export const isStrongPassword = (value) => {
   }
   return null;
 };
+export const isEqual = (value1, value2) => {
+  if (value1 !== value2) {
+    return 'The values do not match.';
+  }
+  return null;
+};

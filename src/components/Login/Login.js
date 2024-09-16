@@ -1,19 +1,21 @@
 import React, { useState } from "react";
-import { Form, Button, Container, Row, Col } from "react-bootstrap";
+import { Form, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import './Login.css'
 import { isStrongPassword, required } from "../../utils/validators/Validators";
 import { showToastError, showToastSuccess } from "../../utils/toast/Toast"; 
 import { login } from "../../services/authServices";
+import { getCustomerDetails } from "../../services/customerServices";
 
 const Login = ({ setRole }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    console.log("logginf...")
 
     const usernameError = required(username);
     if (usernameError) {
@@ -28,6 +30,7 @@ const Login = ({ setRole }) => {
     }
 
     try {
+
       const response = await login(username, password);
       const token = response.headers["authorization"];
       if (token) {
@@ -51,12 +54,18 @@ const Login = ({ setRole }) => {
       } else if (role === "ROLE_CUSTOMER") {
         localStorage.setItem("role", "customer");
         setRole("customer");
-        navigate("/customer-dashboard");
+
+        const customerResponse = await getCustomerDetails();
+        const customerId = customerResponse.userId;
+        localStorage.setItem("firstName", customerResponse.firstName);
+        localStorage.setItem("lastName", customerResponse.lastName);
+        navigate(`/customer-dashboard/${customerId}`);
       }
 
       showToastSuccess("Login successful!");
     } catch (error) {
-        showToastError(error.message || "An error occurred. Please try again.");
+      setError(error.response?.data?.message || "An error occurred. Please try again.");
+      showToastError(error.message || "An error occurred. Please try again.");
     }
   };
 

@@ -13,7 +13,7 @@ export const  login=async(usernameOrEmail,password)=>{
     catch(error){
         if(error.response.data){
             const data=error.response.data;
-            if(data.status==400){
+            if(data.status===400){
                 throw new ValidationError(data.message);
             }
             if (data.status === 401) {
@@ -38,3 +38,25 @@ export const register = async (payload) => {
     }
   };
 
+export const changePassword=async(payLoad)=>{
+
+  try{
+    const token = localStorage.getItem("authToken");
+    if(!token){
+      throw new Error("You are not logged in");
+    }
+    const response=await axios.put(`http://localhost:8080/GuardianLifeAssurance/auth/change-password`,payLoad,{
+      headers:{
+
+        'Authorization': 'Bearer ' + localStorage.getItem('authToken')
+    }});
+    return response.data;
+}
+catch(error){
+  if(error){
+    if(error.response.data.status===400){
+      throw new ValidationError(error.response.data.message);
+    }
+    throw new error("Something went wrong please try again later");
+  }
+}}

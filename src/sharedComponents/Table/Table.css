@@ -1,84 +1,88 @@
 .table-container {
-    width: 100%;
-    margin: 20px 0;
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 10px;
     overflow-x: auto;
-}
-
-.table {
+  }
+  
+  .table {
     width: 100%;
     border-collapse: collapse;
-    border: 1px solid #333;
-}
-
-.thead {
-    background-color: #333;
-    color: white;
-}
-
-th, td {
+    margin-bottom: 20px;
+    border: 1px solid #000; 
+  }
+  
+  
+  .table th{
+    background-color: #f1f1f1;
+  }
+  .table th,
+  .table td {
     padding: 12px 15px;
     text-align: left;
-    border-bottom: 1px solid #555;
-}
-
-th {
-    background-color: #333;
-    color: #ff9800;
-    font-weight: bold;
-}
-
-td {
-    color: #000;
+    
+    border: 1px solid #000; 
     font-size: 14px;
-}
+    color: #000;
+  }
+  
 
-tr:hover>td {
-    cursor: pointer;
-    background-color: #686868;
-    color: white;
-}
+  .table th {
+    font-weight: 600;
+    text-transform: uppercase;
+  }
 
-.pagination-section {
+  .table tr:hover {
+    background-color: transparent;
+    cursor: default; 
+  }
+  
+
+  .pagination-section {
     display: flex;
     justify-content: space-between;
-    margin: 20px 0;
-}
+    align-items: center;
+    padding: 20px 0;
+  }
 
-.custom-dropdown select {
-    padding: 10px;
-    border-radius: 5px;
-    border: 1px solid #555;
-    background-color: #222;
-    color: white;
-    font-size: 14px;
-}
-
-.custom-dropdown select:focus {
-    border-color: #ff4b5c;
-}
-
-.pagination-section button {
-    padding: 10px 15px;
-    border-radius: 5px;
-    border: none;
-    background-color: #ff4b5c;
-    color: white;
+  .custom-dropdown select {
+    padding: 10px 14px;
+    border: 1px solid #000; 
+    border-radius: 4px;
+    background-color: #fff;
     cursor: pointer;
-}
+    font-size: 14px;
+  }
+  
 
-.pagination-section button:hover {
-    background-color: #ff2a3b;
-}
+  .pagination-section button {
+    padding: 10px 20px;
+    font-size: 14px;
+    color: #000;
+    background-color: transparent;
+    border: 1px solid #000; 
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
 
-.pagination-section button:disabled {
-    background-color: #444;
-    cursor: not-allowed;
-    color: #888;
-}
-
-.no-data {
-    color: #888;
-    font-size: 16px;
-    text-align: center;
-    margin-top: 20px;
-}
+  .pagination-section button:hover {
+    background-color: #f1f1f1; 
+  }
+  
+ 
+  @media (max-width: 768px) {
+    .table th,
+    .table td {
+      padding: 10px 12px;
+      font-size: 12px;
+    }
+  
+    .pagination-section {
+      flex-direction: column;
+      gap: 10px;
+    }
+  }
+  

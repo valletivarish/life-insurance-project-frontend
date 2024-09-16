@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import './InsuranceSetting.css'; 
 import { createInsuranceSetting } from '../../../../../services/adminServices'; 
+import { showToastSuccess } from '../../../../../utils/toast/Toast';
 
 const InsuranceSetting = () => {
   const [claimDeduction, setClaimDeduction] = useState('');
@@ -17,8 +18,8 @@ const InsuranceSetting = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await createInsuranceSetting({ claimDeduction, penaltyAmount });
-      console.log(`Claim Deduction: ${claimDeduction}, Penalty Amount: ${penaltyAmount}`);
+      const response=await createInsuranceSetting({ claimDeduction, penaltyAmount });
+      showToastSuccess(response);
     } catch (error) {
       console.error('Error saving insurance setting:', error);
     }

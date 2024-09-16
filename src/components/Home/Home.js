@@ -1,4 +1,3 @@
-import React, { useEffect } from 'react';
 import './Home.css'; 
 
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -10,6 +9,7 @@ import Swiper1 from "../../assets/images/swiper1.png"
 import Swiper2 from "../../assets/images/swiper.png"
 import Swiper3 from "../../assets/images/swiper2.png"
 import AboutUs from "../../assets/images/aboutUs.png"
+
 
 const Home = () => {
     
